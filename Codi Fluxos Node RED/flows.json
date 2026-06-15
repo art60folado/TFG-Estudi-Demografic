@@ -1,0 +1,416 @@
+[
+    {
+        "id": "0cb53823837a3f44",
+        "type": "tab",
+        "label": "Flujo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "89da2c6d304e7c2b",
+        "type": "mqtt-broker",
+        "name": "sitgesbusa",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a35a99ea34e74f11",
+        "type": "mqtt in",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "topic": "sitgesbusa",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "89da2c6d304e7c2b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 420,
+        "y": 160,
+        "wires": [
+            [
+                "f2375e7d90c29d14",
+                "1fa70e2f468d1841"
+            ]
+        ]
+    },
+    {
+        "id": "f2375e7d90c29d14",
+        "type": "debug",
+        "z": "0cb53823837a3f44",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "1fa70e2f468d1841",
+        "type": "change",
+        "z": "0cb53823837a3f44",
+        "name": "store latest location",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bus_location",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "252e57dc70efb738",
+        "type": "http in",
+        "z": "0cb53823837a3f44",
+        "name": "GET /bus-location",
+        "url": "/api/bus-location",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 370,
+        "y": 280,
+        "wires": [
+            [
+                "d7ccad376452bb54"
+            ]
+        ]
+    },
+    {
+        "id": "d7ccad376452bb54",
+        "type": "change",
+        "z": "0cb53823837a3f44",
+        "name": "Retrieve Location",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "bus_location",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 280,
+        "wires": [
+            [
+                "e54587f51b99168c"
+            ]
+        ]
+    },
+    {
+        "id": "e54587f51b99168c",
+        "type": "http response",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "aaddc6cd69b83138",
+        "type": "inject",
+        "z": "0cb53823837a3f44",
+        "name": "Simulate Bus Update",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"imei\":\"869951039320985\",\"lat\":41.243122,\"lon\":1.803092}",
+        "payloadType": "json",
+        "x": 480,
+        "y": 80,
+        "wires": [
+            [
+                "f2375e7d90c29d14",
+                "1fa70e2f468d1841"
+            ]
+        ]
+    },
+    {
+        "id": "fe018f41db394135",
+        "type": "http in",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "url": "/api/bus-schedule",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 380,
+        "y": 380,
+        "wires": [
+            [
+                "ac6b9736105e501f"
+            ]
+        ]
+    },
+    {
+        "id": "ac6b9736105e501f",
+        "type": "template",
+        "z": "0cb53823837a3f44",
+        "name": "Set Schedule Data",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "[\n  {\n    \"stop_id\": 1,\n    \"stop_name\": \"ESTACIÓ - C. ARTUR CARBONELL\",\n    \"times\": [\"06:45\", \"07:25\", \"08:05\", \"08:45\", \"09:25\", \"10:05\", \"10:45\", \"11:25\", \"12:05\", \"12:45\", \"13:25\", \"14:05\", \"14:45\", \"15:25\", \"16:05\", \"16:45\", \"17:25\", \"18:05\", \"18:45\", \"19:25\", \"20:05\", \"20:45\"]\n  },\n  {\n    \"stop_id\": 2,\n    \"stop_name\": \"C. R. LLOPART - COL·LEGI E. BARRACHINA\",\n    \"times\": [\"06:46\", \"07:26\", \"08:06\", \"08:46\", \"09:26\", \"10:06\", \"10:46\", \"11:26\", \"12:06\", \"12:46\", \"13:26\", \"14:06\", \"14:46\", \"15:26\", \"16:06\", \"16:46\", \"17:26\", \"18:06\", \"18:46\", \"19:26\", \"20:06\", \"20:46\"]\n  },\n  {\n    \"stop_id\": 3,\n    \"stop_name\": \"L'ESCORXADOR\",\n    \"times\": [\"06:47\", \"07:27\", \"08:07\", \"08:47\", \"09:27\", \"10:07\", \"10:47\", \"11:27\", \"12:07\", \"12:47\", \"13:27\", \"14:07\", \"14:47\", \"15:27\", \"16:07\", \"16:47\", \"17:27\", \"18:07\", \"18:47\", \"19:27\", \"20:07\", \"20:47\"]\n  },\n  {\n    \"stop_id\": 4,\n    \"stop_name\": \"CEMENTRI\",\n    \"times\": [\"06:48\", \"07:28\", \"08:08\", \"08:48\", \"09:28\", \"10:08\", \"10:48\", \"11:28\", \"12:08\", \"12:48\", \"13:28\", \"14:08\", \"14:48\", \"15:28\", \"16:08\", \"16:48\", \"17:28\", \"18:08\", \"18:48\", \"19:28\", \"20:08\", \"20:48\"]\n  },\n  {\n    \"stop_id\": 5,\n    \"stop_name\": \"HOTEL MELIÀ GRAN SITGES\",\n    \"times\": [\"06:49\", \"07:29\", \"08:09\", \"08:49\", \"09:29\", \"10:09\", \"10:49\", \"11:29\", \"12:09\", \"12:49\", \"13:29\", \"14:09\", \"14:49\", \"15:29\", \"16:09\", \"16:49\", \"17:29\", \"18:09\", \"18:49\", \"19:29\", \"20:09\", \"20:49\"]\n  },\n  {\n    \"stop_id\": 6,\n    \"stop_name\": \"CAMP DE FUTBOL\",\n    \"times\": [\"06:50\", \"07:30\", \"08:10\", \"08:50\", \"09:30\", \"10:10\", \"10:50\", \"11:30\", \"12:10\", \"12:50\", \"13:30\", \"14:10\", \"14:50\", \"15:30\", \"16:10\", \"16:50\", \"17:30\", \"18:10\", \"18:50\", \"19:30\", \"20:10\", \"20:50\"]\n  },\n  {\n    \"stop_id\": 7,\n    \"stop_name\": \"PORT AIGUADOLÇ\",\n    \"times\": [\"06:51\", \"07:31\", \"08:11\", \"08:51\", \"09:31\", \"10:11\", \"10:51\", \"11:31\", \"12:11\", \"12:51\", \"13:31\", \"14:11\", \"14:51\", \"15:31\", \"16:11\", \"16:51\", \"17:31\", \"18:11\", \"18:51\", \"19:31\", \"20:11\", \"20:51\"]\n  },\n  {\n    \"stop_id\": 8,\n    \"stop_name\": \"MONTGAVINA\",\n    \"times\": []\n  },\n  {\n    \"stop_id\": 9,\n    \"stop_name\": \"LLEVANTINA (ASCENDENT)\",\n    \"times\": [\"06:56\", \"07:36\", \"08:16\", \"08:56\", \"09:36\", \"10:16\", \"10:56\", \"11:36\", \"12:16\", \"12:56\", \"13:36\", \"14:16\", \"14:56\", \"15:36\", \"16:16\", \"16:56\", \"17:36\", \"18:16\", \"18:56\", \"19:36\", \"20:16\", \"20:52\"]\n  },\n  {\n    \"stop_id\": 10,\n    \"stop_name\": \"SARDANA - C. DE L'ESCALA\",\n    \"times\": [\"06:57\", \"07:37\", \"08:17\", \"08:57\", \"09:37\", \"10:17\", \"10:57\", \"11:37\", \"12:17\", \"12:57\", \"13:37\", \"14:17\", \"14:57\", \"15:37\", \"16:17\", \"16:57\", \"17:37\", \"18:17\", \"18:57\", \"19:37\", \"20:17\", \"20:53\"]\n  },\n  {\n    \"stop_id\": 11,\n    \"stop_name\": \"ROC FLORIT - MALVASIA\",\n    \"times\": [\"06:58\", \"07:38\", \"08:18\", \"08:58\", \"09:38\", \"10:18\", \"10:58\", \"11:38\", \"12:18\", \"12:58\", \"13:38\", \"14:18\", \"14:58\", \"15:38\", \"16:18\", \"16:58\", \"17:38\", \"18:18\", \"18:58\", \"19:38\", \"20:18\", \"20:54\"]\n  },\n  {\n    \"stop_id\": 12,\n    \"stop_name\": \"ROC FLORIT - CORRAL D'EN FALÇ\",\n    \"times\": [\"07:00\", \"07:40\", \"08:20\", \"09:00\", \"09:40\", \"10:20\", \"11:00\", \"11:40\", \"12:20\", \"13:00\", \"13:40\", \"14:20\", \"15:00\", \"15:40\", \"16:20\", \"17:00\", \"17:40\", \"18:20\", \"19:00\", \"19:40\", \"20:20\", \"20:55\"]\n  },\n  {\n    \"stop_id\": 13,\n    \"stop_name\": \"QUINT MAR - ZONA ESPORTIVA\",\n    \"times\": [\"07:03\", \"07:43\", \"08:23\", \"09:03\", \"09:43\", \"10:23\", \"11:03\", \"11:43\", \"12:23\", \"13:03\", \"13:43\", \"14:23\", \"15:03\", \"15:43\", \"16:23\", \"17:03\", \"17:43\", \"18:23\", \"19:03\", \"19:43\", \"20:23\", \"20:56\"]\n  },\n  {\n    \"stop_id\": 14,\n    \"stop_name\": \"PASSEIG MARGALLÓ - CENTRE CIVIC\",\n    \"times\": [\"07:04\", \"07:44\", \"08:24\", \"09:04\", \"09:44\", \"10:24\", \"11:04\", \"11:44\", \"12:24\", \"13:04\", \"13:44\", \"14:24\", \"15:04\", \"15:44\", \"16:24\", \"17:04\", \"17:44\", \"18:24\", \"19:04\", \"19:44\", \"20:24\", \"20:57\"]\n  },\n  {\n    \"stop_id\": 15,\n    \"stop_name\": \"PASSEIG DE L'ESPIGOL - ESCALES\",\n    \"times\": [\"07:05\", \"07:45\", \"08:25\", \"09:05\", \"09:45\", \"10:25\", \"11:05\", \"11:45\", \"12:25\", \"13:05\", \"13:45\", \"14:25\", \"15:05\", \"15:45\", \"16:25\", \"17:05\", \"17:45\", \"18:25\", \"19:05\", \"19:45\", \"20:25\", \"20:58\"]\n  },\n  {\n    \"stop_id\": 16,\n    \"stop_name\": \"PASSEIG DE L'ESPÍGOL - PASSEIG FONOLL\",\n    \"times\": [\"07:06\", \"07:46\", \"08:26\", \"09:06\", \"09:46\", \"10:26\", \"11:06\", \"11:46\", \"12:26\", \"13:06\", \"13:46\", \"14:26\", \"15:06\", \"15:46\", \"16:26\", \"17:06\", \"17:46\", \"18:26\", \"19:06\", \"19:46\", \"20:26\", \"20:59\"]\n  },\n  {\n    \"stop_id\": 17,\n    \"stop_name\": \"QUINT-MAR ZONA ESPORTIVA (DESCENDENT)\",\n    \"times\": [\"07:07\", \"07:47\", \"08:27\", \"09:07\", \"09:47\", \"10:27\", \"11:07\", \"11:47\", \"12:27\", \"13:07\", \"13:47\", \"14:27\", \"15:07\", \"15:47\", \"16:27\", \"17:07\", \"17:47\", \"18:27\", \"19:07\", \"19:47\", \"20:27\", \"21:00\"]\n  },\n  {\n    \"stop_id\": 18,\n    \"stop_name\": \"LLEVANTINA (DESCENDENT)\",\n    \"times\": [\"07:10\", \"07:50\", \"08:30\", \"09:10\", \"09:50\", \"10:30\", \"11:10\", \"11:50\", \"12:30\", \"13:10\", \"13:50\", \"14:30\", \"15:10\", \"15:50\", \"16:30\", \"17:10\", \"17:50\", \"18:30\", \"19:10\", \"19:50\", \"20:30\", \"21:01\"]\n  },\n  {\n    \"stop_id\": 19,\n    \"stop_name\": \"PLANS D'AIGUADOLÇ\",\n    \"times\": [\"07:12\", \"07:52\", \"08:32\", \"09:12\", \"09:52\", \"10:32\", \"11:12\", \"11:52\", \"12:32\", \"13:12\", \"13:52\", \"14:32\", \"15:12\", \"15:52\", \"16:32\", \"17:12\", \"17:52\", \"18:32\", \"19:12\", \"19:52\", \"20:32\", \"21:02\"]\n  },\n  {\n    \"stop_id\": 20,\n    \"stop_name\": \"LLAR D'INFANTS LA MOIXIGANGA - MOSSOS D'ESQUADRA\",\n    \"times\": [\"07:13\", \"07:53\", \"08:33\", \"09:13\", \"09:53\", \"10:33\", \"11:13\", \"11:53\", \"12:33\", \"13:13\", \"13:53\", \"14:33\", \"15:13\", \"15:53\", \"16:33\", \"17:13\", \"17:53\", \"18:33\", \"19:13\", \"19:53\", \"20:33\", \"21:03\"]\n  },\n  {\n    \"stop_id\": 21,\n    \"stop_name\": \"ELS MOLINS\",\n    \"times\": [\"07:14\", \"07:54\", \"08:34\", \"09:14\", \"09:54\", \"10:34\", \"11:14\", \"11:54\", \"12:34\", \"13:14\", \"13:54\", \"14:34\", \"15:14\", \"15:54\", \"16:34\", \"17:14\", \"17:54\", \"18:34\", \"19:14\", \"19:54\", \"20:34\", \"21:04\"]\n  },\n  {\n    \"stop_id\": 22,\n    \"stop_name\": \"CASES NOVES\",\n    \"times\": [\"07:15\", \"07:55\", \"08:35\", \"09:15\", \"09:55\", \"10:35\", \"11:15\", \"11:55\", \"12:35\", \"13:15\", \"13:55\", \"14:35\", \"15:15\", \"15:55\", \"16:35\", \"17:15\", \"17:55\", \"18:35\", \"19:15\", \"19:55\", \"20:35\", \"21:05\"]\n  },\n  {\n    \"stop_id\": 23,\n    \"stop_name\": \"EMILI PICÓ\",\n    \"times\": [\"07:16\", \"07:56\", \"08:36\", \"09:16\", \"09:56\", \"10:36\", \"11:16\", \"11:56\", \"12:36\", \"13:16\", \"13:56\", \"14:36\", \"15:16\", \"15:56\", \"16:36\", \"17:16\", \"17:56\", \"18:36\", \"19:16\", \"19:56\", \"20:36\", \"21:06\"]\n  },\n  {\n    \"stop_id\": 24,\n    \"stop_name\": \"PASSEIG VILAFRANCA - SANT FRANCESC\",\n    \"times\": [\"07:17\", \"07:57\", \"08:37\", \"09:17\", \"09:57\", \"10:37\", \"11:17\", \"11:57\", \"12:37\", \"13:17\", \"13:57\", \"14:37\", \"15:17\", \"15:57\", \"16:37\", \"17:17\", \"17:57\", \"18:37\", \"19:17\", \"19:57\", \"20:37\", \"21:07\"]\n  }\n]",
+        "output": "json",
+        "x": 630,
+        "y": 380,
+        "wires": [
+            [
+                "772ab978abe7301d"
+            ]
+        ]
+    },
+    {
+        "id": "772ab978abe7301d",
+        "type": "http response",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "da1078c051f305a8",
+        "type": "http in",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "url": "/api/v1/bus/request-stop",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "f3b1ed9ba25fecb0"
+            ]
+        ]
+    },
+    {
+        "id": "f3b1ed9ba25fecb0",
+        "type": "change",
+        "z": "0cb53823837a3f44",
+        "name": "Retrieve button status",
+        "rules": [
+            {
+                "t": "set",
+                "p": "active_request",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 640,
+        "wires": [
+            [
+                "9c5fdb66d7f9f8ca"
+            ]
+        ]
+    },
+    {
+        "id": "9c5fdb66d7f9f8ca",
+        "type": "http response",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 880,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "b0eb52a2b2bb643d",
+        "type": "inject",
+        "z": "0cb53823837a3f44",
+        "name": "bus arrival at stop",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 350,
+        "y": 480,
+        "wires": [
+            [
+                "5db1a89b6229fbcf"
+            ]
+        ]
+    },
+    {
+        "id": "5db1a89b6229fbcf",
+        "type": "function",
+        "z": "0cb53823837a3f44",
+        "name": "calculate delay",
+        "func": "// 1. Generate a dynamic schedule relative to the current execution time\nconst now = new Date();\n\n// Let's pretend the theoretical schedule said the bus was due at Stop A 5 minutes ago\nconst scheduled_Stop_A = new Date(now.getTime() - 5 * 60 * 1000); \n\n// And the schedule says the bus is due at Stop B 15 minutes from now\nconst scheduled_Stop_B = new Date(now.getTime() + 15 * 60 * 1000);\n\n// 2. The actual time the bus passed Stop A is right now\nconst actual_Stop_A = now;\n\n// 3. Calculate the deviation/delay at Stop A (Difference in minutes)\nconst delay_milliseconds = actual_Stop_A.getTime() - scheduled_Stop_A.getTime();\nconst delay_minutes = Math.round(delay_milliseconds / (60 * 1000));\n\n// 4. Propagate that delay forward to calculate the ETA for Stop B\nconst eta_Stop_B = new Date(scheduled_Stop_B.getTime() + (delay_milliseconds));\n\n// Helper function to format JS dates into clean \"HH:MM\" strings\nfunction formatTime(dateObj) {\n    return dateObj.toTimeString().split(' ')[0].substring(0, 5);\n}\n\n// 5. Structure a JSON telematics package\nconst etaPayload = {\n    line: \"Línia L1 Sitges\",\n    last_stop_A: {\n        scheduled: formatTime(scheduled_Stop_A),\n        actual: formatTime(actual_Stop_A),\n        status: delay_minutes > 0 ? \"Retardat\" : \"A temps\"\n    },\n    current_delay_minutes: delay_minutes,\n    next_stop_B: {\n        theoretical_schedule: formatTime(scheduled_Stop_B),\n        calculated_eta: formatTime(eta_Stop_B)\n    }\n};\n\n// 6. Save this package to the Node-RED server global flow memory\nflow.set(\"cached_eta_data\", etaPayload);\n\n// Pass to the debug node for verification\nmsg.payload = etaPayload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 480,
+        "wires": [
+            [
+                "d3d0783083edbd40"
+            ]
+        ]
+    },
+    {
+        "id": "d3d0783083edbd40",
+        "type": "debug",
+        "z": "0cb53823837a3f44",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "087db10a06540f4c",
+        "type": "http in",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "url": "/api/v1/bus/eta",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "c3a4fcc9a1ba40e2"
+            ]
+        ]
+    },
+    {
+        "id": "c3a4fcc9a1ba40e2",
+        "type": "change",
+        "z": "0cb53823837a3f44",
+        "name": "Retrieve ETA time",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "cached_eta_data",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 520,
+        "wires": [
+            [
+                "1f9a7c7bd53e2c54"
+            ]
+        ]
+    },
+    {
+        "id": "1f9a7c7bd53e2c54",
+        "type": "http response",
+        "z": "0cb53823837a3f44",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 520,
+        "wires": []
+    }
+]
